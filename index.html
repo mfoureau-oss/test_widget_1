@@ -36,6 +36,30 @@
             position: relative;
         }
 
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #f8f9fa;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #6c757d;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .close-btn:hover {
+            background: #e9ecef;
+            color: #1a1a1a;
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 0;
@@ -56,6 +80,7 @@
         /* Progress Bar */
         .progress-container {
             margin-bottom: 32px;
+            margin-top: 40px;
         }
 
         .progress-bar {
@@ -290,6 +315,10 @@
             color: #13d0ca;
             text-align: center;
             margin: 32px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
         }
 
         .calculation-breakdown {
@@ -348,9 +377,11 @@
 </head>
 <body>
     <div class="widget">
+        <button class="close-btn" onclick="closeWidget()">×</button>
+        
         <div class="progress-container">
             <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
+                <div class="progress-fill" id="progressFill" style="width: 25%;"></div>
             </div>
             <div class="progress-text" id="progressText">Étape 1 sur 4</div>
         </div>
@@ -362,7 +393,7 @@
             </div>
             
             <h2 class="step-title">Informations sur votre véhicule</h2>
-            <p class="step-subtitle">Renseignez les détails de base de votre véhicule</p>
+            <p class="step-subtitle">Nous vous fournissons une estimation de votre voiture, basée sur son immatriculation, sa version et son kilométrage.</p>
 
             <div class="form-row">
                 <div class="form-group">
@@ -554,21 +585,27 @@
 
             <div class="next-steps">
                 <h3 style="margin-bottom: 12px; font-size: 16px;">Prochaines étapes</h3>
-                <ul style="margin: 0; padding: 0; list-style: none;">
-                    <li style="margin-bottom: 6px; padding-left: 20px; position: relative; font-size: 13px; line-height: 1.4;">
-                        <span style="position: absolute; left: 0; color: #13d0ca; font-weight: bold;">✓</span>
-                        Rendez-vous point de vente pour l'expertise complète de votre véhicule
-                    </li>
-                    <li style="margin-bottom: 0; padding-left: 20px; position: relative; font-size: 13px; line-height: 1.4;">
-                        <span style="position: absolute; left: 0; color: #13d0ca; font-weight: bold;">✓</span>
-                        Reprise de votre véhicule par Spoticar une fois l'expertise validée
-                    </li>
-                </ul>
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="color: #13d0ca; font-size: 20px; font-weight: bold;">✓</div>
+                        <div>
+                            <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">VENTE SIMPLIFIÉE</div>
+                            <div style="font-size: 13px; color: #6c757d;">Aucune démarche administrative</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="color: #13d0ca; font-size: 20px; font-weight: bold;">✓</div>
+                        <div>
+                            <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">PRISE EN MAIN</div>
+                            <div style="font-size: 13px; color: #6c757d;">Une prise en main par un professionnel</div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="button-group">
                 <button class="btn btn-back" onclick="nextStep(3)">Modifier</button>
-                <button class="btn" onclick="restart()">Nouvelle évaluation</button>
+                <button class="btn" onclick="restart()">Continuer avec mon estimation</button>
             </div>
         </div>
     </div>
@@ -583,6 +620,13 @@
             const progress = (currentStep / 4) * 100;
             document.getElementById('progressFill').style.width = progress + '%';
             document.getElementById('progressText').textContent = `Étape ${currentStep} sur 4`;
+        }
+
+        function closeWidget() {
+            // Fonction pour fermer le widget (peut être connectée à votre logique)
+            if (confirm('Êtes-vous sûr de vouloir fermer cette évaluation ?')) {
+                window.close();
+            }
         }
 
         function nextStep(step) {
@@ -659,6 +703,9 @@
             document.getElementById('trimContinue').disabled = true;
             updateProgress();
         }
+
+        // Initialisation
+        updateProgress();
     </script>
 </body>
 </html>
