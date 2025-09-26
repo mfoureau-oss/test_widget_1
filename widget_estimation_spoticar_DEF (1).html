@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Widget d'Estimation Automobile - Spoticar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: rgba(0, 0, 0, 0.5);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            overflow: hidden;
+        }
+
+        .widget-container {
+            width: 100%;
+            max-width: 900px;
+            height: 95vh;
+            max-height: 650px;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .close-btn, .back-button {
+            position: absolute;
+            top: 1rem;
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #f8fafc;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: #64748b;
+            z-index: 10;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover, .back-button:hover {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .close-btn {
+            right: 1rem;
+        }
+
+        .back-button {
+            left: 1rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding-top: 3rem;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+            font-family: Arial, sans-serif;
+        }
+
+        .subtitle {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .progress-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            gap: 0.75rem;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            max-width: 300px;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #13d0ca 0%, #10b7b1 100%);
+            border-radius: 10px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .progress-text {
+            font-size: 0.8rem;
+            color: #475569;
+            font-weight: 500;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .progress-step {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #13d0ca;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: #1f2937;
+            background: #ffffff;
+            transition: all 0.3s ease;
+            min-height: 48px;
+            font-family: Arial, sans-serif;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #13d0ca;
+            box-shadow: 0 0 0 3px rgba(19, 208, 202, 0.1);
+        }
+
+        .form-select {
+            appearance: none;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6,9 12,15 18,9'></polyline></svg>");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 0.875rem;
+        }
+
+        .cta-button {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: #13d0ca;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            min-height: 48px;
+            transition: all 0.2s ease;
+            font-family: Arial, sans-serif;
+        }
+
+        .cta-button:hover {
+            background: #10b7b1;
+            transform: translateY(-1px);
+        }
+
+        .main-content {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            height: calc(100% - 220px);
+        }
+
+        .form-section {
+            flex: 1;
+        }
+
+        .vehicle-recap {
+            flex: 1;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            height: fit-content;
+        }
+
+        .recap-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: Arial, sans-serif;
+        }
+
+        .recap-icon {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            filter: brightness(0) saturate(100%) invert(69%) sepia(57%) saturate(404%) hue-rotate(132deg) brightness(98%) contrast(97%);
+        }
+
+        .recap-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .recap-item:last-child {
+            border-bottom: none;
+        }
+
+        .recap-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .recap-value {
+            font-size: 0.8rem;
+            color: #1f2937;
+            font-weight: 700;
+        }
+
+        .form-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-columns .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .full-width-section {
+            grid-column: 1 / -1;
+        }
+
+        .page-3-layout {
+            display: block;
+        }
+
+        .page {
+            display: none;
+            height: 100%;
+        }
+
+        .page.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .reassurance {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: #f0fdf9;
+            border: 2px solid #bbf7d0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            min-height: 48px;
+            transition: all 0.2s ease;
+            font-size: 0.65rem;
+            white-space: normal;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .reassurance:hover {
+            background: #ecfdf5;
+            border-color: #86efac;
+        }
+
+        .error-message {
+            margin-top: 0.5rem;
+            padding: 0.75rem;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            color: #dc2626;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .optin-section {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .optin-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.75rem;
+            font-family: Arial, sans-serif;
+        }
+
+        .optin-description {
+            font-size: 0.8rem;
+            color: #4b5563;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+        }
+
+        .optin-choices {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .optin-choice {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .optin-choice input[type="radio"] {
+            accent-color: #13d0ca;
+        }
+
+        .optin-choice-label {
+            font-size: 0.8rem;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .vehicle-image-section {
+            text-align: center;
+            padding: 2rem 1.5rem;
+        }
+
+        .vehicle-image {
+            width: 250px;
+            height: auto;
+            margin-bottom: 1.5rem;
+            border-radius: 0;
+            object-fit: contain;
+            background: transparent;
+        }
+
+        .vehicle-description {
+            color: #64748b;
+            line-height: 1.5;
+            font-size: 0.875rem;
+        }
+
+        /* PAGE 4 - STYLES DIRECTS SPOTICAR */
+        #page-4 {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            gap: 2rem;
+            padding: 2rem 1rem;
+        }
+
+        .price-section {
+            background: #f8fafc;
+            padding: 2rem 1rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .price-badge {
+            background: #13d0ca;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            font-family: Arial, sans-serif;
+        }
+
+        .price-amount {
+            font-size: 2.5rem;
+            color: #13d0ca;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            font-family: Arial, sans-serif;
+        }
+
+        .price-disclaimer {
+            font-size: 0.85rem;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        .explanation-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+
+        .explanation-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #1e293b;
+            font-family: Arial, sans-serif;
+        }
+
+        .explanation-text {
+            font-size: 0.9rem;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        .benefits-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .benefit-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+        }
+
+        .benefit-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            font-family: Arial, sans-serif;
+        }
+
+        .benefit-description {
+            font-size: 0.8rem;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .widget-container {
+                max-width: 95%;
+                height: 98vh;
+                max-height: none;
+                padding: 1rem;
+            }
+            
+            .header {
+                padding-top: 2.5rem;
+                margin-bottom: 1rem;
+            }
+            
+            .title {
+                font-size: 1.25rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .main-content {
+                flex-direction: column;
+                gap: 1rem;
+                height: auto;
+            }
+            
+            #page-1 .main-content {
+                flex-direction: column;
+            }
+            
+            #page-1 .vehicle-recap {
+                order: 1;
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            #page-1 .form-section {
+                order: 2;
+            }
+            
+            #page-2 .main-content {
+                flex-direction: column;
+            }
+            
+            #page-2 .vehicle-recap {
+                order: 1;
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            #page-2 .form-section {
+                order: 2;
+            }
+            
+            .form-columns {
+                grid-template-columns: 1fr;
+                gap: 0.875rem;
+            }
+            
+            .optin-choices {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .vehicle-image {
+                width: 250px;
+                height: auto;
+            }
+
+            /* Page 4 mobile */
+            #page-4 {
+                gap: 1.5rem;
+                padding: 3rem 0.5rem 1rem;
+            }
+
+            .price-section {
+                padding: 1.5rem 1rem;
+            }
+
+            .price-amount {
+                font-size: 2rem;
+            }
+
+            .explanation-section {
+                padding: 1.5rem 1rem;
+            }
+
+            .benefits-section {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .benefit-card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="widget-container">
+        <button class="back-button" onclick="goBack()">←</button>
+        <button class="close-btn" onclick="closeModal()">×</button>
+        
+        <!-- Page 1: Informations véhicule -->
+        <div class="page active" id="page-1">
+            <header class="header">
+                <h1 class="title">Estimation Gratuite</h1>
+                <p class="subtitle">Découvrez la valeur de votre véhicule en 2 minutes</p>
+            </header>
+
+            <div class="progress-container">
+                <div class="progress-step">1</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 25%;"></div>
+                </div>
+                <div class="progress-text">1/4</div>
+            </div>
+
+            <div class="main-content">
+                <section class="form-section">
+                    <form id="step1-form">
+                        <div class="form-group">
+                            <label for="immatriculation" class="form-label">Plaque d'immatriculation</label>
+                            <input type="text" id="immatriculation" class="form-input" placeholder="Ex : AB-123-CD" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="kilometrage" class="form-label">Kilométrage du véhicule</label>
+                            <input type="text" id="kilometrage" class="form-input" placeholder="Ex : 85 000" required>
+                        </div>
+
+                        <button type="submit" class="cta-button">Obtenir mon estimation</button>
+                        
+                        <div class="reassurance">
+                            <span class="reassurance-text">Vos données sont sécurisées • Estimation gratuite et sans engagement</span>
+                        </div>
+                    </form>
+                </section>
+
+                <aside class="vehicle-recap">
+                    <div class="vehicle-image-section">
+                        <img src="https://usine-a-sites.s3.eu-west-1.amazonaws.com/site-peugeot-test/Spoticar-Logo-Vector.svg-.png" 
+                             alt="Logo Spoticar" 
+                             class="vehicle-image">
+                        <p class="vehicle-description">
+                            Nous vous fournissons une estimation de votre voiture, basée sur son immatriculation, sa version et son kilométrage.
+                        </p>
+                    </div>
+                </aside>
+            </div>
+        </div>
+
+        <!-- Page 2: Confirmation véhicule -->
+        <div class="page" id="page-2">
+            <header class="header">
+                <h1 class="title">Confirmation du véhicule</h1>
+                <p class="subtitle">Sélectionnez la version exacte de votre véhicule</p>
+            </header>
+
+            <div class="progress-container">
+                <div class="progress-step">2</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 50%;"></div>
+                </div>
+                <div class="progress-text">2/4</div>
+            </div>
+
+            <div class="main-content">
+                <section class="form-section">
+                    <form id="step2-form">
+                        <div class="form-group">
+                            <label for="vehicle-version" class="form-label">Version de votre véhicule</label>
+                            <select id="vehicle-version" class="form-select" required>
+                                <option value="">Sélectionnez la version</option>
+                                <option value="1.2 PureTech 130 Active">1.2 PureTech 130 Active</option>
+                                <option value="1.2 PureTech 130 Allure">1.2 PureTech 130 Allure</option>
+                                <option value="1.2 PureTech 130 GT Line">1.2 PureTech 130 GT Line</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="cta-button">Continuer</button>
+                        
+                        <div class="reassurance">
+                            <span class="reassurance-text">Vos données sont sécurisées • Estimation gratuite et sans engagement</span>
+                        </div>
+                    </form>
+                </section>
+
+                <aside class="vehicle-recap">
+                    <h2 class="recap-title">
+                        <img src="https://usine-a-sites.s3.eu-west-1.amazonaws.com/site-peugeot-test/SPOTICAR-FAVICON_SMALL_0.png" 
+                             alt="Icône véhicule" 
+                             class="recap-icon">
+                        Votre véhicule
+                    </h2>
+                    
+                    <div class="recap-item">
+                        <span class="recap-label">Immatriculation</span>
+                        <span class="recap-value" id="recap-immat">-</span>
+                    </div>
+                    
+                    <div class="recap-item">
+                        <span class="recap-label">Marque</span>
+                        <span class="recap-value">Peugeot</span>
+                    </div>
+                    
+                    <div class="recap-item">
+                        <span class="recap-label">Modèle</span>
+                        <span class="recap-value">3008</span>
+                    </div>
+                    
+                    <div class="recap-item">
+                        <span class="recap-label">Version</span>
+                        <span class="recap-value" id="recap-version-page2">-</span>
+                    </div>
+                    
+                    <div class="recap-item">
+                        <span class="recap-label">Kilométrage</span>
+                        <span class="recap-value" id="recap-km">-</span>
+                    </div>
+                </aside>
+            </div>
+        </div>
+
+        <!-- Page 3: Coordonnées -->
+        <div class="page" id="page-3">
+            <header class="header">
+                <h1 class="title">Vos coordonnées</h1>
+                <p class="subtitle">Dernière étape pour recevoir votre estimation</p>
+            </header>
+
+            <div class="progress-container">
+                <div class="progress-step">3</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 75%;"></div>
+                </div>
+                <div class="progress-text">3/4</div>
+            </div>
+
+            <div class="page-3-layout" style="flex: 1; overflow-y: auto;">
+                <form id="step3-form" class="form-columns">
+                    <div class="form-group">
+                        <label for="nom" class="form-label">Nom</label>
+                        <input type="text" id="nom" class="form-input" placeholder="Votre nom" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prenom" class="form-label">Prénom</label>
+                        <input type="text" id="prenom" class="form-input" placeholder="Votre prénom" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email" class="form-label">Adresse e-mail</label>
+                        <input type="email" id="email" class="form-input" placeholder="votre.email@example.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telephone" class="form-label">Numéro de téléphone</label>
+                        <input type="tel" id="telephone" class="form-input" placeholder="06 12 34 56 78" required>
+                    </div>
+
+                    <div class="full-width-section">
+                        <div class="optin-section">
+                            <h3 class="optin-title">Rejoignez-nous !</h3>
+                            <p class="optin-description">
+                                Nous souhaitons vous proposer la meilleure expérience possible ! Gardons le contact ! Recevez des offres promotionnelles adaptées à votre profil, profitez d'événements exclusifs et suivez toute l'actualité de nos Marques.
+                            </p>
+                            <div class="optin-choices">
+                                <label class="optin-choice">
+                                    <input type="radio" name="optin1" value="accept">
+                                    <span class="optin-choice-label">J'accepte</span>
+                                </label>
+                                <label class="optin-choice">
+                                    <input type="radio" name="optin1" value="decline">
+                                    <span class="optin-choice-label">Je n'accepte pas</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="optin-section">
+                            <h3 class="optin-title">Rejoignez nos partenaires !</h3>
+                            <p class="optin-description">
+                                Vous souhaitez bénéficier des offres et des avantages exclusifs de nos partenaires de confiance et leur permettre de communiquer avec vous directement ?
+                            </p>
+                            <div class="optin-choices">
+                                <label class="optin-choice">
+                                    <input type="radio" name="optin2" value="accept">
+                                    <span class="optin-choice-label">J'accepte</span>
+                                </label>
+                                <label class="optin-choice">
+                                    <input type="radio" name="optin2" value="decline">
+                                    <span class="optin-choice-label">Je n'accepte pas</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="full-width-section">
+                        <button type="submit" class="cta-button">Continuer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Page 4: Résultat - SPOTICAR DESIGN -->
+        <div class="page" id="page-4">
+            <!-- Section Prix -->
+            <div class="price-section">
+                <div class="price-badge">✓ Estimation validée</div>
+                <div class="price-amount">13 350 € <sup style="font-size: 0.4em; color: #64748b;">(1)</sup></div>
+                <div class="price-disclaimer">
+                    (1) L'estimation peut varier en point de vente. Expire dans 10 jours.
+                </div>
+            </div>
+
+            <!-- Section Explication -->
+            <div class="explanation-section">
+                <h3 class="explanation-title">Comment avons-nous calculé ce prix ?</h3>
+                <p class="explanation-text">
+                    Notre estimation repose sur les caractéristiques de votre véhicule et l'analyse du marché.
+                </p>
+            </div>
+
+            <!-- Section Avantages -->
+            <div class="benefits-section">
+                <div class="benefit-card">
+                    <h4 class="benefit-title">PRISE EN MAIN</h4>
+                    <p class="benefit-description">Une prise en main par un professionnel</p>
+                </div>
+                
+                <div class="benefit-card">
+                    <h4 class="benefit-title">VENTE SIMPLIFIÉE</h4>
+                    <p class="benefit-description">Aucune démarche administrative</p>
+                </div>
+            </div>
+
+            <!-- Section CTA -->
+            <div class="cta-section">
+                <button class="cta-button" onclick="alert('Redirection vers sélection concessionnaire')">
+                    Continuer votre estimation
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentPage = 1;
+        let formData = {};
+
+        function showPage(pageNumber) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(`page-${pageNumber}`).classList.add('active');
+            currentPage = pageNumber;
+            
+            const backBtn = document.querySelector('.back-button');
+            backBtn.style.display = pageNumber === 1 ? 'none' : 'block';
+        }
+
+        function nextPage() {
+            if (currentPage < 4) {
+                showPage(currentPage + 1);
+                updateRecap();
+            }
+        }
+
+        function updateRecap() {
+            if (formData.immatriculation) {
+                const elements = document.querySelectorAll('#recap-immat');
+                elements.forEach(el => el.textContent = formData.immatriculation);
+            }
+            if (formData.kilometrage) {
+                const elements = document.querySelectorAll('#recap-km');
+                elements.forEach(el => el.textContent = formData.kilometrage + ' km');
+            }
+            if (formData.version) {
+                const elements = document.querySelectorAll('#recap-version-page2');
+                elements.forEach(el => el.textContent = formData.version);
+            }
+        }
+
+        function goBack() {
+            if (currentPage > 1) {
+                showPage(currentPage - 1);
+            }
+        }
+
+        function closeModal() {
+            console.log('Fermer');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('step1-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                formData.immatriculation = document.getElementById('immatriculation').value;
+                formData.kilometrage = document.getElementById('kilometrage').value;
+                nextPage();
+            });
+
+            document.getElementById('step2-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                formData.version = document.getElementById('vehicle-version').value;
+                nextPage();
+            });
+
+            document.getElementById('step3-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                nextPage();
+            });
+        });
+    </script>
+</body>
+</html>
