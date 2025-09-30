@@ -34,100 +34,53 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: #f8f9fa;
+            background: url('https://usine-a-sites.s3.eu-west-1.amazonaws.com/site-peugeot-test/Capture+d%E2%80%99e%CC%81cran+2025-09-30+a%CC%80+23.33.49.png') no-repeat center center;
+            background-size: cover;
             overflow: hidden;
         }
 
         .site-header {
-            background: #ffffff;
-            padding: 1.5rem 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: none;
         }
 
         .site-logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #13d0ca;
+            display: none;
         }
 
         .site-nav {
-            display: flex;
-            gap: 2rem;
-            font-size: 0.95rem;
-            color: #333;
+            display: none;
         }
 
         .site-hero {
-            padding: 4rem 2rem;
-            text-align: center;
-        }
-
-        .site-hero h1 {
-            font-size: 2.5rem;
-            color: #1a1a1a;
-            margin-bottom: 1rem;
-            font-weight: bold;
-        }
-
-        .site-hero p {
-            font-size: 1.2rem;
-            color: #666;
-            max-width: 700px;
-            margin: 0 auto 2rem;
-            line-height: 1.6;
+            display: none;
         }
 
         .site-cars {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            padding: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
+            display: none;
         }
 
         .car-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            display: none;
         }
 
         .car-image {
-            width: 100%;
-            height: 200px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 3rem;
+            display: none;
         }
 
         .car-info {
-            padding: 1.5rem;
+            display: none;
         }
 
         .car-name {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #1a1a1a;
-            margin-bottom: 0.5rem;
+            display: none;
         }
 
         .car-details {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 1rem;
+            display: none;
         }
 
         .car-price {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #13d0ca;
+            display: none;
         }
 
         .modal-overlay {
@@ -136,9 +89,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.7);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -709,49 +660,7 @@
 </head>
 <body>
     <!-- Contenu du site en arrière-plan -->
-    <div class="site-background">
-        <div class="site-header">
-            <div class="site-logo">SPOTICAR</div>
-            <div class="site-nav">
-                <span>Accueil</span>
-                <span>Véhicules</span>
-                <span>Services</span>
-                <span>Contact</span>
-            </div>
-        </div>
-        
-        <div class="site-hero">
-            <h1>Trouvez votre véhicule d'occasion</h1>
-            <p>Des véhicules de qualité, contrôlés et garantis. Profitez de notre expertise et de notre engagement pour votre satisfaction.</p>
-        </div>
-        
-        <div class="site-cars">
-            <div class="car-card">
-                <div class="car-image">🚗</div>
-                <div class="car-info">
-                    <div class="car-name">Peugeot 308</div>
-                    <div class="car-details">2022 • 45 000 km • Diesel</div>
-                    <div class="car-price">18 900 €</div>
-                </div>
-            </div>
-            <div class="car-card">
-                <div class="car-image">🚙</div>
-                <div class="car-info">
-                    <div class="car-name">Citroën C5 Aircross</div>
-                    <div class="car-details">2021 • 32 000 km • Hybride</div>
-                    <div class="car-price">24 500 €</div>
-                </div>
-            </div>
-            <div class="car-card">
-                <div class="car-image">🚐</div>
-                <div class="car-info">
-                    <div class="car-name">Peugeot 3008</div>
-                    <div class="car-details">2023 • 18 000 km • Essence</div>
-                    <div class="car-price">26 900 €</div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="site-background"></div>
 
     <!-- Modal Widget -->
     <div class="modal-overlay">
