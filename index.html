@@ -790,7 +790,7 @@
                     <div class="form-row">
                         <div class="form-group" style="margin-bottom: 0;">
                             <label class="form-label">Immatriculation</label>
-                            <input type="text" class="form-input" id="immatriculation" placeholder="AA-123-CD" maxlength="10">
+                            <input type="text" class="form-input" id="immatriculation" placeholder="Ex. AB-123-CD" maxlength="10">
                             <div class="error-message" id="error-immat">Format invalide (ex: AA-123-CD)</div>
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
@@ -810,7 +810,7 @@
                         </p>
                     </div>
                     
-                    <button class="cta-button" onclick="goToStep(2)">Confirmer le véhicule</button>
+                    <button class="cta-button" onclick="goToStep(2)" id="btn-step1" disabled>Confirmer le véhicule</button>
                 </div>
 
                 <!-- ÉTAPE 2 -->
@@ -896,7 +896,7 @@
                         </div>
                     </div>
                     
-                    <button class="cta-button" onclick="goToStep(4)">Valider</button>
+                    <button class="cta-button" onclick="goToStep(4)" id="btn-step3" disabled>Obtenir votre estimation</button>
                 </div>
 
                 <!-- ÉTAPE 4 -->
@@ -957,7 +957,27 @@
             }
             
             hideError('immat');
+            checkStep1Completion();
         });
+
+        document.getElementById('kilometrage').addEventListener('input', function() {
+            hideError('km');
+            checkStep1Completion();
+        });
+
+        function checkStep1Completion() {
+            const immat = document.getElementById('immatriculation').value.trim();
+            const km = document.getElementById('kilometrage').value.trim();
+            const btn = document.getElementById('btn-step1');
+            
+            const immatRegex = /^[A-Z]{2}-[0-9]{3}-[A-Z]{2}$/;
+            
+            if (immatRegex.test(immat) && km && parseInt(km) > 0) {
+                btn.disabled = false;
+            } else {
+                btn.disabled = true;
+            }
+        }
 
         // Formatage automatique du téléphone
         document.getElementById('telephone').addEventListener('input', function(e) {
@@ -979,20 +999,56 @@
         document.getElementById('nom').addEventListener('input', function(e) {
             e.target.value = e.target.value.replace(/[^a-zA-ZÀ-ÿ\s\-']/g, '');
             hideError('nom');
+            checkStep3Completion();
         });
 
         document.getElementById('prenom').addEventListener('input', function(e) {
             e.target.value = e.target.value.replace(/[^a-zA-ZÀ-ÿ\s\-']/g, '');
             hideError('prenom');
+            checkStep3Completion();
         });
 
         document.getElementById('email').addEventListener('input', function() {
             hideError('email');
+            checkStep3Completion();
         });
 
-        document.getElementById('kilometrage').addEventListener('input', function() {
-            hideError('km');
+        document.getElementById('telephone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            let formatted = '';
+            
+            for (let i = 0; i < value.length && i < 10; i++) {
+                if (i > 0 && i % 2 === 0) {
+                    formatted += ' ';
+                }
+                formatted += value[i];
+            }
+            
+            e.target.value = formatted;
+            hideError('tel');
+            checkStep3Completion();
         });
+
+        document.getElementById('consent1').addEventListener('change', checkStep3Completion);
+
+        function checkStep3Completion() {
+            const nom = document.getElementById('nom').value.trim();
+            const prenom = document.getElementById('prenom').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const tel = document.getElementById('telephone').value.trim();
+            const btn = document.getElementById('btn-step3');
+            
+            const nameRegex = /^[a-zA-ZÀ-ÿ\s\-']+$/;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const telRegex = /^[0-9]{2}\s[0-9]{2}\s[0-9]{2}\s[0-9]{2}\s[0-9]{2}$/;
+            
+            if (nameRegex.test(nom) && nameRegex.test(prenom) && 
+                emailRegex.test(email) && telRegex.test(tel)) {
+                btn.disabled = false;
+            } else {
+                btn.disabled = true;
+            }
+        }
 
         function showError(field) {
             const input = document.getElementById(field === 'immat' ? 'immatriculation' : field === 'km' ? 'kilometrage' : field === 'tel' ? 'telephone' : field);
