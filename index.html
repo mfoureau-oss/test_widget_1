@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Évaluation de Véhicule</title>
+    <title>Estimation SPOTICAR</title>
     <style>
         * {
             margin: 0;
@@ -13,80 +13,118 @@
 
         body {
             font-family: Arial, sans-serif;
-            background: #f8f9fa;
+            background: rgba(0, 0, 0, 0.5);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            line-height: 1.6;
-            color: #1a1a1a;
-            padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+            padding: 1rem;
         }
 
-        .widget {
-            background: white;
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .widget-container {
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            background: #ffffff;
             border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-            width: clamp(560px, 80vw, 760px);
-            max-height: 90svh;
-            max-height: 90dvh; /* fallback */
-            max-height: 90vh; /* fallback */
-            overflow-y: auto;
-            padding: clamp(16px, 2vw, 24px);
             position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .close-btn {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 1rem;
+            right: 1rem;
             width: 32px;
             height: 32px;
             border: none;
-            background: #f8f9fa;
+            background: #f5f5f5;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            color: #6c757d;
-            transition: all 0.2s ease;
+            font-size: 1.25rem;
+            color: #666;
             z-index: 10;
+            transition: all 0.2s ease;
         }
 
         .close-btn:hover {
-            background: #e9ecef;
-            color: #1a1a1a;
+            background: #e0e0e0;
+            color: #333;
         }
 
-        @media (max-width: 768px) {
-            body {
-                padding: 0;
-                align-items: stretch;
-            }
-            
-            .widget {
-                width: 100%;
-                max-height: 100svh;
-                max-height: 100dvh; /* fallback */
-                max-height: 100vh; /* fallback */
-                border-radius: 0;
-                padding: clamp(12px, 4vw, 16px);
-                box-shadow: none;
-            }
+        .widget-header {
+            padding: 1.5rem 1.5rem 1rem;
+            text-align: center;
         }
 
-        /* Progress Bar */
-        .progress-container {
-            margin-bottom: 32px;
-            margin-top: 40px;
+        .logo {
+            width: 160px;
+            height: 50px;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .main-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        .subtitle.hidden {
+            display: none !important;
+        }
+
+        .main-title.hidden {
+            display: none !important;
         }
 
         .progress-bar {
-            width: 100%;
             height: 4px;
-            background: #e9ecef;
+            background: #e0e0e0;
+            margin: 1rem 1.5rem;
             border-radius: 2px;
             overflow: hidden;
         }
@@ -95,75 +133,69 @@
             height: 100%;
             background: #13d0ca;
             transition: width 0.3s ease;
-            border-radius: 2px;
         }
 
-        .progress-text {
-            margin-top: 8px;
-            font-size: 14px;
-            color: #6c757d;
+        .step-indicator {
             text-align: center;
+            font-size: 0.85rem;
+            color: #666;
+            white-space: nowrap;
+            font-weight: 500;
         }
 
-        /* Logo */
-        .logo {
-            text-align: center;
-            margin-bottom: 32px;
+        .widget-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 1.5rem 1.5rem;
         }
 
-        .logo img {
-            max-width: 200px;
-            height: auto;
+        #step-4 {
+            overflow-y: visible;
         }
 
-        /* Steps */
+        #step-4 .widget-content {
+            overflow-y: visible;
+        }
+
         .step {
             display: none;
         }
 
         .step.active {
             display: block;
+            animation: fadeIn 0.3s ease;
         }
 
-        .step-title {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            text-align: center;
-        }
-
-        .step-subtitle {
-            color: #6c757d;
-            margin-bottom: 32px;
-            text-align: center;
-        }
-
-        /* Form Elements */
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        @media (max-width: 768px) {
-            .form-group {
-                margin-bottom: 8px;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
             }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
         }
 
         .form-label {
             display: block;
-            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #000;
+            margin-bottom: 0.5rem;
             font-weight: 500;
-            color: #1a1a1a;
         }
 
         .form-input {
             width: 100%;
-            padding: 16px;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            font-size: 16px;
+            padding: 0.875rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: #000;
+            font-family: Arial, sans-serif;
             transition: border-color 0.2s ease;
-            background: white;
         }
 
         .form-input:focus {
@@ -171,541 +203,569 @@
             border-color: #13d0ca;
         }
 
-        .form-select {
-            width: 100%;
-            padding: 16px;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            font-size: 16px;
-            background: white;
-            cursor: pointer;
-            transition: border-color 0.2s ease;
+        .form-input::placeholder {
+            color: #999;
         }
 
-        .form-select:focus {
-            outline: none;
-            border-color: #13d0ca;
+        .vehicle-recap {
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
         }
 
-        /* Two Column Layout */
-        .form-row {
+        .finition-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
         }
 
-        @media (max-width: 540px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Vehicle Summary */
-        .vehicle-summary {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 12px;
-            margin: 24px 0;
-        }
-
-        .vehicle-summary h3 {
-            margin-bottom: 12px;
-            font-size: 18px;
-        }
-
-        .vehicle-detail {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .vehicle-detail:last-child {
-            margin-bottom: 0;
-            font-weight: 600;
-            padding-top: 12px;
-            border-top: 1px solid #dee2e6;
-        }
-
-        /* Options - NOUVELLES RÈGLES COMPACTES */
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 8px;
-            margin: 16px 0;
-        }
-
-        .option-card {
-            border: 2px solid #e9ecef;
+        .finition-card {
+            padding: 0.875rem;
+            border: 2px solid #ddd;
             border-radius: 8px;
-            padding: 8px 4px;
+            background: #fff;
             cursor: pointer;
             transition: all 0.2s ease;
             text-align: center;
-            min-height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-size: 0.9rem;
+            color: #000;
+            font-weight: 500;
         }
 
-        .option-card:hover {
-            border-color: #13d0ca;
-        }
-
-        .option-card.selected {
+        .finition-card:hover {
             border-color: #13d0ca;
             background: #f0fffe;
         }
 
-        .option-title {
-            font-weight: 600;
-            font-size: 13px;
-        }
-
-        .option-price {
-            color: #13d0ca;
-            font-weight: 600;
-        }
-
-        /* Button */
-        .btn {
-            width: 100%;
-            padding: 16px 24px;
+        .finition-card.selected {
+            border-color: #13d0ca;
             background: #13d0ca;
             color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            margin-top: 24px;
         }
 
-        .btn:hover {
-            background: #10b3ae;
+        .checkbox-group {
+            margin-bottom: 1rem;
         }
 
-        .btn:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-        }
-
-        .btn-back {
-            background: #e9ecef;
-            color: #1a1a1a;
-            margin-right: 12px;
-            width: auto;
-            flex: 1;
-        }
-
-        .btn-back:hover {
-            background: #dee2e6;
-        }
-
-        .button-group {
+        .checkbox-wrapper {
             display: flex;
-            gap: 12px;
-            margin-top: 24px;
+            align-items: flex-start;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
         }
 
-        /* Estimate Display */
-        .estimate-amount {
-            font-size: 48px;
-            font-weight: 700;
+        .checkbox-wrapper input[type="checkbox"] {
+            margin-top: 0.25rem;
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            cursor: pointer;
+            accent-color: #13d0ca;
+        }
+
+        .checkbox-wrapper label {
+            font-size: 0.8rem;
+            color: #333;
+            line-height: 1.5;
+            cursor: pointer;
+        }
+
+        .checkbox-wrapper label a {
             color: #13d0ca;
-            text-align: center;
-            margin: 32px 0;
+            text-decoration: underline;
+        }
+
+        .consent-section-title {
+            font-weight: bold;
+            font-size: 0.875rem;
+            color: #000;
+            margin: 1.5rem 0 1rem;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 4px;
+            gap: 0.5rem;
         }
 
-        .calculation-breakdown {
-            background: #f8f9fa;
-            padding: 24px;
-            border-radius: 12px;
-            margin: 24px 0;
+        .consent-section-title::after {
+            content: '▲';
+            font-size: 0.7rem;
+            color: #13d0ca;
         }
 
-        .calculation-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #dee2e6;
+        .consent-section-title.collapsed::after {
+            content: '▼';
         }
 
-        .calculation-item:last-child {
-            border-bottom: none;
-            font-weight: 600;
-            font-size: 18px;
+        .consent-details {
+            font-size: 0.8rem;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .consent-details.hidden {
+            display: none;
+        }
+
+        .result-price {
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        .price-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-amount {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #13d0ca;
+        }
+
+        .info-box {
+            background: #f8f8f8;
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .info-box strong {
+            color: #000;
+            display: block;
+            margin-bottom: 0.5rem;
         }
 
         .next-steps {
-            background: #f0fffe;
-            border: 1px solid #13d0ca;
-            border-radius: 8px;
-            padding: 16px;
-            margin: 24px 0;
+            margin-top: 1.5rem;
         }
 
-        .next-steps h3 {
-            color: #0fa9a4;
-            margin-bottom: 16px;
-        }
-
-        .next-steps ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .next-steps li {
-            margin-bottom: 8px;
-            padding-left: 24px;
-            position: relative;
-        }
-
-        .next-steps li::before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #13d0ca;
+        .next-steps-title {
+            font-size: 1.125rem;
             font-weight: bold;
+            color: #000;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .step-card {
+            background: #f8f8f8;
+            padding: 1.25rem;
+            border-radius: 8px;
+            border-left: 4px solid #13d0ca;
+        }
+
+        .step-card-title {
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .step-card-text {
+            font-size: 0.85rem;
+            color: #555;
+            line-height: 1.4;
+        }
+
+        .cta-button {
+            width: 100%;
+            padding: 1rem;
+            background: #13d0ca;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: Arial, sans-serif;
+            margin-top: 1.5rem;
+        }
+
+        .cta-button:hover {
+            background: #0fb8b3;
+            transform: translateY(-1px);
+        }
+
+        .cta-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (min-width: 640px) {
+            .widget-container {
+                max-width: 560px;
+            }
+
+            .finition-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .steps-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            #step-1 > div:first-child {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        @media (max-height: 700px) {
+            .widget-container {
+                max-height: 95vh;
+            }
+
+            .main-title {
+                font-size: 1.25rem;
+            }
+
+            .logo {
+                width: 120px;
+                height: 35px;
+                font-size: 1.1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="widget">
-        <button class="close-btn" onclick="closeWidget()">×</button>
-        
-        <div class="progress-container">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill" style="width: 25%;"></div>
-            </div>
-            <div class="progress-text" id="progressText">Étape 1 sur 4</div>
-        </div>
-
-        <!-- Step 1: Vehicle Information -->
-        <div class="step active" id="step1">
-            <div class="logo">
-                <img src="https://usine-a-sites.s3.eu-west-1.amazonaws.com/site-peugeot-test/Spoticar-Logo-Vector.svg-.png" alt="Spoticar" />
-            </div>
+    <div class="modal-overlay">
+        <div class="widget-container">
+            <button class="close-btn" onclick="closeWidget()" aria-label="Fermer">×</button>
             
-            <h2 class="step-title">Informations sur votre véhicule</h2>
-            <p class="step-subtitle">Nous vous fournissons une estimation de votre voiture, basée sur son immatriculation, sa version et son kilométrage.</p>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label" for="registration">Numéro d'immatriculation</label>
-                    <input type="text" id="registration" class="form-input" placeholder="AB-123-CD" />
+            <div class="widget-header">
+                <div class="logo">
+                    <img src="https://www.spoticar.lu/sites/spoticar.be/files/inline-images/2019-01-07-Logo-Spoticar.png" alt="SPOTICAR">
                 </div>
-                <div class="form-group">
-                    <label class="form-label" for="mileage">Kilométrage</label>
-                    <input type="number" id="mileage" class="form-input" placeholder="150000" />
-                </div>
+                <h1 class="main-title">Informations sur votre véhicule</h1>
+                <p class="subtitle" id="subtitle">Nous vous fournissons une estimation de votre voiture, basée sur son immatriculation, sa version et son kilométrage.</p>
             </div>
 
-            <div style="background: #f0fffe; border: 1px solid #13d0ca; border-radius: 8px; padding: 16px; margin: 24px 0; display: flex; align-items: center; gap: 12px;">
-                <div style="color: #13d0ca; font-size: 20px; font-weight: bold;">✓</div>
-                <div>
-                    <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Évaluation gratuite et sans engagement</div>
-                    <div style="font-size: 14px; color: #6c757d;">Obtenez une estimation précise en 2 minutes. Aucune obligation d'achat.</div>
-                </div>
-            </div>
-
-            <button class="btn" onclick="nextStep(2)">Continuer</button>
-        </div>
-
-        <!-- Step 2: Vehicle Trim Selection -->
-        <div class="step" id="step2">
-            <h2 class="step-title">Choisissez votre finition</h2>
-            <p class="step-subtitle">Sélectionnez la finition qui correspond à votre véhicule</p>
-
-            <div class="vehicle-summary" id="vehicleSummary">
-                <h3 style="display: flex; align-items: center; gap: 8px;">
-                    <span style="color: #13d0ca; font-size: 18px;">✓</span>
-                    Véhicule trouvé
-                </h3>
-                <div class="vehicle-detail">
-                    <span>Marque :</span>
-                    <span id="vehicleBrand">Peugeot</span>
-                </div>
-                <div class="vehicle-detail">
-                    <span>Modèle :</span>
-                    <span id="vehicleModel">308</span>
-                </div>
-                <div class="vehicle-detail">
-                    <span>Énergie :</span>
-                    <span id="vehicleEnergy">Hybride</span>
-                </div>
-                <div class="vehicle-detail">
-                    <span>Année :</span>
-                    <span id="vehicleYear">2022</span>
-                </div>
-                <div class="vehicle-detail">
-                    <span>Kilométrage :</span>
-                    <span id="vehicleMileage">150 000 km</span>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Finitions disponibles</label>
-                <div class="options-grid">
-                    <div class="option-card trim-option" data-trim="style" onclick="selectTrim(this, 'style')">
-                        <div class="option-title">Style</div>
+            <div id="progress-container">
+                <div style="display: flex; align-items: center; gap: 1rem; margin: 1rem 1.5rem;">
+                    <div class="progress-bar" style="margin: 0; flex: 1;">
+                        <div class="progress-fill" id="progress-fill" style="width: 25%"></div>
                     </div>
-                    <div class="option-card trim-option" data-trim="allure" onclick="selectTrim(this, 'allure')">
-                        <div class="option-title">Allure</div>
-                    </div>
-                    <div class="option-card trim-option" data-trim="allure-pack" onclick="selectTrim(this, 'allure-pack')">
-                        <div class="option-title">Allure Pack</div>
-                    </div>
-                    <div class="option-card trim-option" data-trim="gt" onclick="selectTrim(this, 'gt')">
-                        <div class="option-title">GT</div>
-                    </div>
-                    <div class="option-card trim-option" data-trim="gt-pack" onclick="selectTrim(this, 'gt-pack')">
-                        <div class="option-title">GT Pack</div>
+                    <div class="step-indicator" style="margin: 0;">
+                        <span id="step-text">Étape 1/4</span>
                     </div>
                 </div>
             </div>
 
-            <div class="button-group">
-                <button class="btn btn-back" onclick="nextStep(1)">Retour</button>
-                <button class="btn" id="trimContinue" onclick="nextStep(3)" disabled>Continuer</button>
-            </div>
-        </div>
-
-        <!-- Step 3: Contact Information -->
-        <div class="step" id="step3">
-            <h2 class="step-title">Vos informations</h2>
-            <p class="step-subtitle">Pour finaliser votre évaluation personnalisée</p>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label" for="firstName">Prénom</label>
-                    <input type="text" id="firstName" class="form-input" placeholder="Jean" />
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="lastName">Nom</label>
-                    <input type="text" id="lastName" class="form-input" placeholder="Dupont" />
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label" for="email">Email</label>
-                    <input type="email" id="email" class="form-input" placeholder="jean.dupont@email.com" />
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="phone">Téléphone</label>
-                    <input type="tel" id="phone" class="form-input" placeholder="06 12 34 56 78" />
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Consentements</label>
-                <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <label style="display: flex; align-items: flex-start; gap: 8px; font-weight: normal; cursor: pointer;">
-                        <input type="checkbox" id="consent-data" style="margin-top: 2px; min-width: 16px;">
-                        <span style="font-size: 14px;">Vos données personnelles seront traitées par SVO - SPOTICAR, situé au 2-10 Boulevard de l'Europe, 78300 Poissy, en tant que responsable de traitement, tel que décrit dans la <a href="#" style="color: #13d0ca; text-decoration: none;">Politique de Confidentialité</a>, où vous trouverez plus d'informations sur vos droits liés à la confidentialité et les moyens de nous contacter.</span>
-                    </label>
+            <div class="widget-content">
+                <!-- ÉTAPE 1 : Identification -->
+                <div class="step active" id="step-1">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label">Immatriculation</label>
+                            <input type="text" class="form-input" id="immatriculation" placeholder="AB-123-CD" maxlength="9">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label">Kilométrage</label>
+                            <input type="number" class="form-input" id="kilometrage" placeholder="Ex: 75000" min="0">
+                        </div>
+                    </div>
                     
-                    <div style="border-top: 1px solid #e9ecef; padding-top: 16px;">
-                        <div style="font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
-                            <span>Rejoignez-nous !</span>
-                            <span style="color: #13d0ca; font-size: 18px;">▲</span>
+                    <div style="background: #f0fffe; border-left: 3px solid #13d0ca; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                            <span style="font-size: 1.25rem;">✓</span>
+                            <strong style="font-size: 0.9rem; color: #000;">Estimation gratuite et instantanée</strong>
                         </div>
-                        <div style="margin-bottom: 16px;">
-                            <p style="font-size: 14px; color: #6c757d; margin-bottom: 12px; line-height: 1.4;">
-                                Nous aimerions entretenir un lien privilégié avec vous et vous seul(e), et personnaliser l'expérience que nous allons partager ! Recevez des offres et des affaires personnalisées, des promotions, des invitations à des événements et d'autres contenus intéressants sur nos marques. Restons en contact ! Si vous voulez en savoir plus sur ce que nous ferons de vos données, consultez les sections 4.c et 4.f) de notre <a href="#" style="color: #13d0ca; text-decoration: none;">Politique de confidentialité</a>. Et ne vous inquiétez pas ! Vous pourrez changer d'avis à tout moment en cliquant sur https://preferences.stellantis.com ! Si vous souhaitez donner votre consentement à des fins explicites uniquement
-                            </p>
-                        </div>
-                        <label style="display: flex; align-items: flex-start; gap: 8px; font-weight: normal; cursor: pointer; margin-bottom: 12px;">
-                            <input type="checkbox" id="consent-marketing" style="margin-top: 2px; min-width: 16px;">
-                            <span style="font-size: 14px;">Je suis d'accord</span>
-                        </label>
+                        <p style="font-size: 0.8rem; color: #555; line-height: 1.5; margin: 0;">
+                            Obtenez une estimation précise de votre véhicule en quelques clics, sans engagement et en toute confidentialité.
+                        </p>
                     </div>
-
-                    <div style="border-top: 1px solid #e9ecef; padding-top: 16px;">
-                        <div style="font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
-                            <span>Si vous souhaitez en savoir plus sur ce que nous ferons de vos données, veuillez consulter la section</span>
-                            <span style="color: #13d0ca; font-size: 18px;">▼</span>
-                        </div>
-                    </div>
-
-                    <div style="border-top: 1px solid #e9ecef; padding-top: 16px;">
-                        <div style="font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
-                            <span>Rejoignez nos partenaires !</span>
-                            <span style="color: #13d0ca; font-size: 18px;">▲</span>
-                        </div>
-                        <div style="margin-bottom: 16px;">
-                            <p style="font-size: 14px; color: #6c757d; margin-bottom: 12px; line-height: 1.4;">
-                                Nous formons une grande communauté et partageons des choses intéressantes ! Si vous souhaitez rencontrer nos fantastiques partenaires et leur permettre de vous contacter directement, inscrivez-vous ! Si vous voulez en savoir plus sur ce que nous ferons de vos données, consultez la section 4.h) de notre <a href="#" style="color: #13d0ca; text-decoration: none;">Politique de confidentialité</a>. Et ne vous inquiétez pas ! Vous pourrez changer d'avis à tout moment en cliquant sur https://preferences.stellantis.com !
-                            </p>
-                        </div>
-                        <label style="display: flex; align-items: flex-start; gap: 8px; font-weight: normal; cursor: pointer; margin-bottom: 12px;">
-                            <input type="checkbox" id="consent-partners" style="margin-top: 2px; min-width: 16px;">
-                            <span style="font-size: 14px;">Je suis d'accord</span>
-                        </label>
-                        <label style="display: flex; align-items: flex-start; gap: 8px; font-weight: normal; cursor: pointer;">
-                            <input type="checkbox" id="consent-no-partners" style="margin-top: 2px; min-width: 16px;">
-                            <span style="font-size: 14px;">Je ne suis pas d'accord</span>
-                        </label>
-                    </div>
+                    
+                    <button class="cta-button" onclick="goToStep(2)">Suivant</button>
                 </div>
-            </div>
 
-            <div class="button-group">
-                <button class="btn btn-back" onclick="nextStep(2)">Retour</button>
-                <button class="btn" onclick="nextStep(4)">Obtenir mon estimation</button>
-            </div>
-        </div>
-
-        <!-- Step 4: Confirmation -->
-        <div class="step" id="step4">
-            <h2 class="step-title">Votre estimation</h2>
-            
-            <p style="font-size: 14px; color: #6c757d; text-align: center; margin: 0 0 16px 0; border-bottom: 1px solid #f0f0f0; padding-bottom: 16px;" id="vehicleRecapFinal">
-                Peugeot 308 Hybride • 2022 • 150 000 km • Finition Style
-            </p>
-
-            <div class="estimate-amount">15 750€ <sup style="font-size: 16px; color: #6c757d;">(1)</sup></div>
-
-            <p style="font-size: 12px; color: #6c757d; text-align: center; margin: -16px 0 32px 0; line-height: 1.4;">
-                (1) L'estimation peut être ajustée lors de votre rendez-vous en point de vente. Estimation valable jusqu'au 04/10/25.
-            </p>
-
-            <div class="calculation-breakdown">
-                <h3 style="margin-bottom: 12px; font-size: 16px;">Comment avons-nous calculé ce prix ?</h3>
-                <p style="color: #6c757d; font-size: 13px; line-height: 1.5; margin: 0;">
-                    Notre estimation repose sur les caractéristiques de votre véhicule et sur l'analyse des tendances du marché. Elle inclut une déduction forfaitaire pour les frais de remise en état, ajustable en fonction de l'état réel de votre voiture.
-                </p>
-            </div>
-
-            <div class="next-steps">
-                <h3 style="margin-bottom: 12px; font-size: 16px;">Prochaines étapes</h3>
-                <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="color: #13d0ca; font-size: 20px; font-weight: bold;">✓</div>
-                        <div>
-                            <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">VENTE SIMPLIFIÉE</div>
-                            <div style="font-size: 13px; color: #6c757d;">Aucune démarche administrative</div>
-                        </div>
+                <!-- ÉTAPE 2 : Finition -->
+                <div class="step" id="step-2">
+                    <div class="vehicle-recap" id="recap-step2" style="margin-bottom: 1rem;"></div>
+                    
+                    <h2 class="form-label" style="margin-bottom: 0.875rem; font-size: 0.95rem;">Sélectionnez la finition</h2>
+                    <div class="finition-grid" style="gap: 0.625rem; margin-bottom: 1rem;">
+                        <div class="finition-card" onclick="selectFinition('Active')">Active</div>
+                        <div class="finition-card" onclick="selectFinition('Allure')">Allure</div>
+                        <div class="finition-card" onclick="selectFinition('GT Line')">GT Line</div>
+                        <div class="finition-card" onclick="selectFinition('GT')">GT</div>
+                        <div class="finition-card" onclick="selectFinition('Style')">Style</div>
+                        <div class="finition-card" onclick="selectFinition('Access')">Access</div>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="color: #13d0ca; font-size: 20px; font-weight: bold;">✓</div>
-                        <div>
-                            <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">PRISE EN MAIN</div>
-                            <div style="font-size: 13px; color: #6c757d;">Une prise en main par un professionnel</div>
-                        </div>
-                    </div>
+                    <button class="cta-button" onclick="goToStep(3)" id="btn-step2" disabled style="margin-top: 0.75rem;">Suivant</button>
                 </div>
-            </div>
 
-            <div class="button-group">
-                <button class="btn btn-back" onclick="nextStep(3)">Modifier</button>
-                <button class="btn" onclick="restart()">Continuer avec mon estimation</button>
+                <!-- ÉTAPE 3 : Contact -->
+                <div class="step" id="step-3">
+                    <div class="vehicle-recap" id="recap-step3"></div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label">Nom</label>
+                            <input type="text" class="form-input" id="nom" placeholder="Votre nom">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label">Prénom</label>
+                            <input type="text" class="form-input" id="prenom" placeholder="Votre prénom">
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" id="email" placeholder="votre@email.com">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label">Téléphone</label>
+                            <input type="tel" class="form-input" id="telephone" placeholder="06 12 34 56 78">
+                        </div>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <h3 style="font-size: 0.9rem; font-weight: bold; color: #000; margin-bottom: 1rem;">Consentements</h3>
+                        
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="consent1" required>
+                            <label for="consent1">Vos données personnelles seront traitées par SVO - SPOTICAR, situé au 2-10 Boulevard de l'Europe, 78300 Poissy, en tant que responsable de traitement, tel que décrit dans la <a href="#" target="_blank">Politique de Confidentialité</a>, où vous trouverez plus d'informations sur vos droits liés à la confidentialité et les moyens de nous contacter.</label>
+                        </div>
+
+                        <div class="consent-section-title" onclick="toggleSection('rejoignez1')">
+                            Rejoignez-nous !
+                        </div>
+                        <div class="consent-details" id="rejoignez1">
+                            Nous aimerions entretenir un lien privilégié avec vous et vous seul(e), et personnaliser l'expérience que nous allons partager ! Recevez des offres et des affaires personnalisées, des promotions, des invitations à des événements et d'autres contenus intéressants sur nos marques. Restons en contact ! Si vous voulez en savoir plus sur ce que nous ferons de vos données, consultez les sections 4.c et 4.h de notre <a href="#" target="_blank">Politique de confidentialité</a>. Et ne vous inquiétez pas ! Vous pourrez changer d'avis à tout moment en cliquant sur https://preferences.stellantis.com ! Si vous souhaitez donner votre consentement à des fins explicites uniquement
+                        </div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="consent2">
+                            <label for="consent2">Je suis d'accord</label>
+                        </div>
+
+                        <div class="consent-section-title" onclick="toggleSection('rejoignez2')">
+                            Si vous souhaitez en savoir plus sur ce que nous ferons de vos données, veuillez consulter la section
+                        </div>
+                        
+                        <div class="consent-section-title" onclick="toggleSection('partenaires')">
+                            Rejoignez nos partenaires !
+                        </div>
+                        <div class="consent-details" id="partenaires">
+                            Nous formons une grande communauté et partageons des choses intéressantes ! Si vous souhaitez rencontrer nos fantastiques partenaires et leur permettre de vous contacter directement, inscrivez-vous ! Si vous voulez en savoir plus sur ce que nous ferons de vos données, consultez la section 4.h de notre <a href="#" target="_blank">Politique de confidentialité</a>. Et ne vous inquiétez pas ! Vous pourrez changer d'avis à tout moment en cliquant sur https://preferences.stellantis.com !
+                        </div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="consent3">
+                            <label for="consent3">Je suis d'accord</label>
+                        </div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="consent4">
+                            <label for="consent4">Je ne suis pas d'accord</label>
+                        </div>
+                    </div>
+                    
+                    <button class="cta-button" onclick="goToStep(4)">Valider</button>
+                </div>
+
+                <!-- ÉTAPE 4 : Résultat -->
+                <div class="step" id="step-4">
+                    <div class="result-price" style="margin: 0.5rem 0 1rem;">
+                        <div class="price-label" style="font-size: 0.85rem;">Estimation de votre véhicule</div>
+                        <div class="price-amount" id="estimated-price" style="font-size: 2.25rem;">12 500 €</div>
+                    </div>
+
+                    <div class="vehicle-recap" id="recap-step4" style="font-size: 0.8rem; margin-bottom: 1rem;"></div>
+
+                    <div class="info-box" style="margin: 1rem 0 0.875rem; padding: 0.875rem; font-size: 0.75rem; line-height: 1.5;">
+                        <strong style="font-size: 0.8rem; margin-bottom: 0.375rem;">Comment avons-nous calculé ce prix ?</strong>
+                        Notre estimation repose sur les caractéristiques de votre véhicule et sur l'analyse des tendances du marché. Elle inclut une déduction forfaitaire pour les frais de remise en état, ajustable en fonction de l'état réel de votre voiture.
+                    </div>
+
+                    <div class="next-steps">
+                        <h3 class="next-steps-title" style="font-size: 0.95rem; margin-bottom: 0.625rem;">Prochaines étapes</h3>
+                        <div class="steps-grid" style="gap: 0.625rem;">
+                            <div class="step-card" style="padding: 0.875rem;">
+                                <div class="step-card-title" style="font-size: 0.8rem; margin-bottom: 0.375rem;">Vente simplifiée</div>
+                                <div class="step-card-text" style="font-size: 0.75rem;">Aucune démarche administrative à votre charge</div>
+                            </div>
+                            <div class="step-card" style="padding: 0.875rem;">
+                                <div class="step-card-title" style="font-size: 0.8rem; margin-bottom: 0.375rem;">Prise en main</div>
+                                <div class="step-card-text" style="font-size: 0.75rem;">Une prise en main par un professionnel qualifié</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="cta-button" onclick="closeWidget()" style="margin-top: 0.875rem; padding: 0.875rem;">Terminer</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         let currentStep = 1;
-        let selectedTrim = '';
-        let trimBonus = 0;
-        let baseEstimate = 15000;
+        let selectedFinition = null;
+        let userData = {
+            immatriculation: '',
+            kilometrage: '',
+            finition: '',
+            nom: '',
+            prenom: '',
+            email: '',
+            telephone: ''
+        };
 
-        function updateProgress() {
-            const progress = (currentStep / 4) * 100;
-            document.getElementById('progressFill').style.width = progress + '%';
-            document.getElementById('progressText').textContent = `Étape ${currentStep} sur 4`;
+        function goToStep(step) {
+            if (!validateCurrentStep()) {
+                return;
+            }
+
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            currentStep = step;
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+
+            const progress = (step / 4) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            document.getElementById('step-text').textContent = `Étape ${step}/4`;
+
+            // Masquer le sous-titre à partir de l'étape 2
+            const subtitle = document.getElementById('subtitle');
+            const mainTitle = document.querySelector('.main-title');
+            
+            if (step >= 2) {
+                subtitle.classList.add('hidden');
+            } else {
+                subtitle.classList.remove('hidden');
+            }
+
+            // Masquer le titre et le sous-titre à l'étape 4
+            if (step === 4) {
+                mainTitle.classList.add('hidden');
+                subtitle.classList.add('hidden');
+            } else {
+                mainTitle.classList.remove('hidden');
+            }
+
+            if (step === 4) {
+                document.getElementById('progress-container').style.display = 'none';
+                calculateEstimation();
+            }
+
+            updateRecap(step);
+        }
+
+        function validateCurrentStep() {
+            if (currentStep === 1) {
+                const immat = document.getElementById('immatriculation').value.trim();
+                const km = document.getElementById('kilometrage').value.trim();
+                
+                if (!immat || !km) {
+                    alert('Veuillez remplir tous les champs');
+                    return false;
+                }
+                
+                userData.immatriculation = immat;
+                userData.kilometrage = km;
+            }
+
+            if (currentStep === 2) {
+                if (!selectedFinition) {
+                    alert('Veuillez sélectionner une finition');
+                    return false;
+                }
+                userData.finition = selectedFinition;
+            }
+
+            if (currentStep === 3) {
+                const nom = document.getElementById('nom').value.trim();
+                const prenom = document.getElementById('prenom').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const tel = document.getElementById('telephone').value.trim();
+                const consent1 = document.getElementById('consent1').checked;
+
+                if (!nom || !prenom || !email || !tel || !consent1) {
+                    alert('Veuillez remplir tous les champs obligatoires et accepter les conditions de confidentialité');
+                    return false;
+                }
+
+                userData.nom = nom;
+                userData.prenom = prenom;
+                userData.email = email;
+                userData.telephone = tel;
+            }
+
+            return true;
+        }
+
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const title = event.target;
+            
+            if (section) {
+                section.classList.toggle('hidden');
+                title.classList.toggle('collapsed');
+            }
+        }
+
+        function selectFinition(finition) {
+            document.querySelectorAll('.finition-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            selectedFinition = finition;
+            document.getElementById('btn-step2').disabled = false;
+        }
+
+        function updateRecap(step) {
+            let recap = '';
+            
+            if (step === 2) {
+                recap = `Peugeot 308 Hybride • 2022 • ${parseInt(userData.kilometrage).toLocaleString('fr-FR')} km`;
+                document.getElementById('recap-step2').innerHTML = recap;
+            } else if (step === 3 || step === 4) {
+                recap = `Peugeot 308 Hybride • 2022 • ${parseInt(userData.kilometrage).toLocaleString('fr-FR')} km${userData.finition ? ' • ' + userData.finition : ''}`;
+                if (step === 3) {
+                    document.getElementById('recap-step3').innerHTML = recap;
+                } else {
+                    document.getElementById('recap-step4').innerHTML = recap;
+                }
+            }
+        }
+
+        function calculateEstimation() {
+            const basePrice = 15000;
+            const kmPenalty = Math.floor(userData.kilometrage / 10000) * 500;
+            const estimatedPrice = Math.max(8000, basePrice - kmPenalty);
+            
+            document.getElementById('estimated-price').textContent = 
+                estimatedPrice.toLocaleString('fr-FR') + ' €';
         }
 
         function closeWidget() {
-            // Fonction pour fermer le widget (peut être connectée à votre logique)
-            if (confirm('Êtes-vous sûr de vouloir fermer cette évaluation ?')) {
-                window.close();
+            if (confirm('Voulez-vous vraiment fermer l\'estimation ?')) {
+                window.location.reload();
             }
         }
 
-        function nextStep(step) {
-            // Hide current step
-            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
-            
-            // Show target step
-            document.getElementById(`step${step}`).classList.add('active');
-            currentStep = step;
-            updateProgress();
-
-            // Special actions for specific steps
-            if (step === 2) {
-                // Update vehicle info in step 2
-                const mileage = document.getElementById('mileage').value;
-                if (mileage) {
-                    document.getElementById('vehicleMileage').textContent = mileage + ' km';
-                }
-            } else if (step === 4) {
-                updateEstimate();
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeWidget();
             }
-        }
-
-        function selectTrim(element, trim) {
-            // Remove selection from all trim options
-            document.querySelectorAll('.trim-option').forEach(el => el.classList.remove('selected'));
-            
-            // Select current trim
-            element.classList.add('selected');
-            selectedTrim = trim;
-            
-            // Set trim bonus
-            const trimBonuses = {
-                'style': 0,
-                'allure': 750,
-                'allure-pack': 1200,
-                'gt': 1500,
-                'gt-pack': 2000
-            };
-            trimBonus = trimBonuses[trim];
-            
-            // Enable continue button
-            document.getElementById('trimContinue').disabled = false;
-        }
-
-        function updateEstimate() {
-            const mileageDeduction = -1500; // Fixed for demo
-            const finalTotal = baseEstimate + mileageDeduction + trimBonus;
-            
-            // Update the estimate amount (keeping the (1) reference)
-            document.querySelector('.estimate-amount').innerHTML = `${finalTotal.toLocaleString()}€ <sup style="font-size: 16px; color: #6c757d;">(1)</sup>`;
-            
-            // Update vehicle recap with selected trim
-            const mileage = document.getElementById('mileage').value || '150 000';
-            const trimNames = {
-                'style': 'Style',
-                'allure': 'Allure',
-                'allure-pack': 'Allure Pack',
-                'gt': 'GT',
-                'gt-pack': 'GT Pack'
-            };
-            const trimName = trimNames[selectedTrim] || 'Style';
-            document.getElementById('vehicleRecapFinal').textContent = `Peugeot 308 Hybride • 2022 • ${mileage} km • Finition ${trimName}`;
-        }
-
-        function restart() {
-            currentStep = 1;
-            selectedTrim = '';
-            trimBonus = 0;
-            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
-            document.getElementById('step1').classList.add('active');
-            document.querySelectorAll('input, select').forEach(el => el.value = '');
-            document.querySelectorAll('.option-card').forEach(el => el.classList.remove('selected'));
-            document.getElementById('trimContinue').disabled = true;
-            updateProgress();
-        }
-
-        // Initialisation
-        updateProgress();
+        });
     </script>
 </body>
 </html>
