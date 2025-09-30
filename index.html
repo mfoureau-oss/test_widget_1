@@ -2,7 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Estimation SPOTICAR</title>
     <style>
         * {
@@ -15,10 +17,16 @@
             font-family: Arial, sans-serif;
             background: rgba(0, 0, 0, 0.5);
             min-height: 100vh;
+            min-height: -webkit-fill-available;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 1rem;
+            overflow: hidden;
+        }
+
+        html {
+            height: -webkit-fill-available;
         }
 
         .modal-overlay {
@@ -36,6 +44,7 @@
             width: 100%;
             max-width: 480px;
             max-height: 90vh;
+            max-height: calc(100vh - 2rem);
             background: #ffffff;
             border-radius: 16px;
             position: relative;
@@ -44,6 +53,12 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+        }
+
+        @supports (-webkit-touch-callout: none) {
+            .widget-container {
+                max-height: calc(100vh - 180px);
+            }
         }
 
         @keyframes slideUp {
@@ -59,37 +74,60 @@
 
         .close-btn {
             position: absolute;
-            top: 1rem;
-            right: 1rem;
-            width: 32px;
-            height: 32px;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 36px;
+            height: 36px;
             border: none;
-            background: #f5f5f5;
+            background: #f1f5f9;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.25rem;
-            color: #666;
-            z-index: 10;
+            font-size: 1.5rem;
+            color: #64748b;
             transition: all 0.2s ease;
+            z-index: 10;
         }
 
-        .close-btn:hover {
-            background: #e0e0e0;
-            color: #333;
+        .back-button {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: #f1f5f9;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: #64748b;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .back-button.visible {
+            display: flex;
+        }
+
+        .close-btn:hover, .back-button:hover {
+            background: #e2e8f0;
+            color: #475569;
         }
 
         .widget-header {
-            padding: 1.5rem 1.5rem 1rem;
+            padding: 1rem 1.5rem 0.5rem;
             text-align: center;
         }
 
         .logo {
             width: 160px;
             height: 50px;
-            margin: 0 auto 1rem;
+            margin: 0 auto 0.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -105,7 +143,11 @@
             font-size: 1.5rem;
             font-weight: bold;
             color: #000;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .main-title.hidden {
+            display: none !important;
         }
 
         .subtitle {
@@ -117,14 +159,9 @@
             display: none !important;
         }
 
-        .main-title.hidden {
-            display: none !important;
-        }
-
         .progress-bar {
             height: 4px;
             background: #e0e0e0;
-            margin: 1rem 1.5rem;
             border-radius: 2px;
             overflow: hidden;
         }
@@ -149,14 +186,6 @@
             padding: 0 1.5rem 1.5rem;
         }
 
-        #step-4 {
-            overflow-y: visible;
-        }
-
-        #step-4 .widget-content {
-            overflow-y: visible;
-        }
-
         .step {
             display: none;
         }
@@ -167,12 +196,8 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .form-group {
@@ -220,8 +245,8 @@
         .finition-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
+            gap: 0.625rem;
+            margin-bottom: 1rem;
         }
 
         .finition-card {
@@ -315,58 +340,59 @@
 
         .result-price {
             text-align: center;
-            margin: 1.5rem 0;
+            margin: 0.5rem 0 1rem;
         }
 
         .price-label {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #666;
             margin-bottom: 0.5rem;
         }
 
         .price-amount {
-            font-size: 2.5rem;
+            font-size: 2.25rem;
             font-weight: bold;
             color: #13d0ca;
         }
 
         .info-box {
             background: #f8f8f8;
-            padding: 1.25rem;
+            padding: 0.875rem;
             border-radius: 8px;
-            margin: 1.5rem 0;
-            font-size: 0.875rem;
-            line-height: 1.6;
+            margin: 1rem 0 0.875rem;
+            font-size: 0.75rem;
+            line-height: 1.5;
             color: #333;
         }
 
         .info-box strong {
             color: #000;
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.375rem;
+            font-size: 0.8rem;
         }
 
         .next-steps {
-            margin-top: 1.5rem;
+            margin-top: 0.875rem;
         }
 
         .next-steps-title {
-            font-size: 1.125rem;
+            font-size: 0.95rem;
             font-weight: bold;
             color: #000;
-            margin-bottom: 1rem;
+            margin-bottom: 0.625rem;
             text-align: center;
         }
 
         .steps-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 1rem;
+            gap: 0.625rem;
         }
 
         .step-card {
             background: #f8f8f8;
-            padding: 1.25rem;
+            padding: 0.875rem;
             border-radius: 8px;
             border-left: 4px solid #13d0ca;
         }
@@ -374,19 +400,19 @@
         .step-card-title {
             font-weight: bold;
             color: #000;
-            margin-bottom: 0.5rem;
-            font-size: 0.95rem;
+            margin-bottom: 0.375rem;
+            font-size: 0.8rem;
         }
 
         .step-card-text {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             color: #555;
             line-height: 1.4;
         }
 
         .cta-button {
             width: 100%;
-            padding: 1rem;
+            padding: 0.875rem;
             background: #13d0ca;
             color: white;
             border: none;
@@ -396,7 +422,7 @@
             cursor: pointer;
             transition: all 0.2s ease;
             font-family: Arial, sans-serif;
-            margin-top: 1.5rem;
+            margin-top: 1rem;
         }
 
         .cta-button:hover {
@@ -411,22 +437,20 @@
         }
 
         @media (min-width: 640px) {
-            .widget-container {
-                max-width: 560px;
-            }
-
             .finition-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-
             .steps-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
 
         @media (max-width: 480px) {
-            #step-1 > div:first-child {
+            .form-row {
                 grid-template-columns: 1fr !important;
+            }
+            .form-row .form-group {
+                margin-bottom: 1rem !important;
             }
         }
 
@@ -434,15 +458,12 @@
             .widget-container {
                 max-height: 95vh;
             }
-
             .main-title {
                 font-size: 1.25rem;
             }
-
             .logo {
                 width: 120px;
                 height: 35px;
-                font-size: 1.1rem;
             }
         }
     </style>
@@ -450,6 +471,7 @@
 <body>
     <div class="modal-overlay">
         <div class="widget-container">
+            <button class="back-button" onclick="goBack()" aria-label="Retour">←</button>
             <button class="close-btn" onclick="closeWidget()" aria-label="Fermer">×</button>
             
             <div class="widget-header">
@@ -461,7 +483,7 @@
             </div>
 
             <div id="progress-container">
-                <div style="display: flex; align-items: center; gap: 1rem; margin: 1rem 1.5rem;">
+                <div style="display: flex; align-items: center; gap: 1rem; margin: 0.5rem 1.5rem 0.75rem;">
                     <div class="progress-bar" style="margin: 0; flex: 1;">
                         <div class="progress-fill" id="progress-fill" style="width: 25%"></div>
                     </div>
@@ -472,9 +494,9 @@
             </div>
 
             <div class="widget-content">
-                <!-- ÉTAPE 1 : Identification -->
+                <!-- ÉTAPE 1 -->
                 <div class="step active" id="step-1">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;" class="form-row">
                         <div class="form-group" style="margin-bottom: 0;">
                             <label class="form-label">Immatriculation</label>
                             <input type="text" class="form-input" id="immatriculation" placeholder="AB-123-CD" maxlength="9">
@@ -498,12 +520,12 @@
                     <button class="cta-button" onclick="goToStep(2)">Suivant</button>
                 </div>
 
-                <!-- ÉTAPE 2 : Finition -->
+                <!-- ÉTAPE 2 -->
                 <div class="step" id="step-2">
                     <div class="vehicle-recap" id="recap-step2" style="margin-bottom: 1rem;"></div>
                     
                     <h2 class="form-label" style="margin-bottom: 0.875rem; font-size: 0.95rem;">Sélectionnez la finition</h2>
-                    <div class="finition-grid" style="gap: 0.625rem; margin-bottom: 1rem;">
+                    <div class="finition-grid" style="margin-bottom: 1rem;">
                         <div class="finition-card" onclick="selectFinition('Active')">Active</div>
                         <div class="finition-card" onclick="selectFinition('Allure')">Allure</div>
                         <div class="finition-card" onclick="selectFinition('GT Line')">GT Line</div>
@@ -514,11 +536,11 @@
                     <button class="cta-button" onclick="goToStep(3)" id="btn-step2" disabled style="margin-top: 0.75rem;">Suivant</button>
                 </div>
 
-                <!-- ÉTAPE 3 : Contact -->
+                <!-- ÉTAPE 3 -->
                 <div class="step" id="step-3">
                     <div class="vehicle-recap" id="recap-step3"></div>
                     
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;" class="form-row">
                         <div class="form-group" style="margin-bottom: 0;">
                             <label class="form-label">Nom</label>
                             <input type="text" class="form-input" id="nom" placeholder="Votre nom">
@@ -529,7 +551,7 @@
                         </div>
                     </div>
                     
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;" class="form-row">
                         <div class="form-group" style="margin-bottom: 0;">
                             <label class="form-label">Email</label>
                             <input type="email" class="form-input" id="email" placeholder="votre@email.com">
@@ -559,10 +581,6 @@
                             <label for="consent2">Je suis d'accord</label>
                         </div>
 
-                        <div class="consent-section-title" onclick="toggleSection('rejoignez2')">
-                            Si vous souhaitez en savoir plus sur ce que nous ferons de vos données, veuillez consulter la section
-                        </div>
-                        
                         <div class="consent-section-title" onclick="toggleSection('partenaires')">
                             Rejoignez nos partenaires !
                         </div>
@@ -582,35 +600,35 @@
                     <button class="cta-button" onclick="goToStep(4)">Valider</button>
                 </div>
 
-                <!-- ÉTAPE 4 : Résultat -->
+                <!-- ÉTAPE 4 -->
                 <div class="step" id="step-4">
-                    <div class="result-price" style="margin: 0.5rem 0 1rem;">
-                        <div class="price-label" style="font-size: 0.85rem;">Estimation de votre véhicule</div>
-                        <div class="price-amount" id="estimated-price" style="font-size: 2.25rem;">12 500 €</div>
+                    <div class="result-price">
+                        <div class="price-label">Estimation de votre véhicule</div>
+                        <div class="price-amount" id="estimated-price">12 500 €</div>
                     </div>
 
                     <div class="vehicle-recap" id="recap-step4" style="font-size: 0.8rem; margin-bottom: 1rem;"></div>
 
-                    <div class="info-box" style="margin: 1rem 0 0.875rem; padding: 0.875rem; font-size: 0.75rem; line-height: 1.5;">
-                        <strong style="font-size: 0.8rem; margin-bottom: 0.375rem;">Comment avons-nous calculé ce prix ?</strong>
+                    <div class="info-box">
+                        <strong>Comment avons-nous calculé ce prix ?</strong>
                         Notre estimation repose sur les caractéristiques de votre véhicule et sur l'analyse des tendances du marché. Elle inclut une déduction forfaitaire pour les frais de remise en état, ajustable en fonction de l'état réel de votre voiture.
                     </div>
 
                     <div class="next-steps">
-                        <h3 class="next-steps-title" style="font-size: 0.95rem; margin-bottom: 0.625rem;">Prochaines étapes</h3>
-                        <div class="steps-grid" style="gap: 0.625rem;">
-                            <div class="step-card" style="padding: 0.875rem;">
-                                <div class="step-card-title" style="font-size: 0.8rem; margin-bottom: 0.375rem;">Vente simplifiée</div>
-                                <div class="step-card-text" style="font-size: 0.75rem;">Aucune démarche administrative à votre charge</div>
+                        <h3 class="next-steps-title">Prochaines étapes</h3>
+                        <div class="steps-grid">
+                            <div class="step-card">
+                                <div class="step-card-title">Vente simplifiée</div>
+                                <div class="step-card-text">Aucune démarche administrative à votre charge</div>
                             </div>
-                            <div class="step-card" style="padding: 0.875rem;">
-                                <div class="step-card-title" style="font-size: 0.8rem; margin-bottom: 0.375rem;">Prise en main</div>
-                                <div class="step-card-text" style="font-size: 0.75rem;">Une prise en main par un professionnel qualifié</div>
+                            <div class="step-card">
+                                <div class="step-card-title">Prise en main</div>
+                                <div class="step-card-text">Une prise en main par un professionnel qualifié</div>
                             </div>
                         </div>
                     </div>
 
-                    <button class="cta-button" onclick="closeWidget()" style="margin-top: 0.875rem; padding: 0.875rem;">Terminer</button>
+                    <button class="cta-button" onclick="closeWidget()">Terminer</button>
                 </div>
             </div>
         </div>
@@ -642,30 +660,69 @@
             document.getElementById('progress-fill').style.width = progress + '%';
             document.getElementById('step-text').textContent = `Étape ${step}/4`;
 
-            // Masquer le sous-titre à partir de l'étape 2
             const subtitle = document.getElementById('subtitle');
             const mainTitle = document.querySelector('.main-title');
+            const backButton = document.querySelector('.back-button');
+            const progressContainer = document.getElementById('progress-container');
             
-            if (step >= 2) {
-                subtitle.classList.add('hidden');
-            } else {
-                subtitle.classList.remove('hidden');
+            if (subtitle) {
+                if (step >= 2) {
+                    subtitle.classList.add('hidden');
+                } else {
+                    subtitle.classList.remove('hidden');
+                }
             }
 
-            // Masquer le titre et le sous-titre à l'étape 4
-            if (step === 4) {
-                mainTitle.classList.add('hidden');
-                subtitle.classList.add('hidden');
-            } else {
-                mainTitle.classList.remove('hidden');
+            if (mainTitle) {
+                if (step === 4) {
+                    mainTitle.classList.add('hidden');
+                    if (subtitle) subtitle.classList.add('hidden');
+                } else {
+                    mainTitle.classList.remove('hidden');
+                }
             }
 
-            if (step === 4) {
-                document.getElementById('progress-container').style.display = 'none';
+            if (backButton) {
+                if (step >= 2) {
+                    backButton.classList.add('visible');
+                } else {
+                    backButton.classList.remove('visible');
+                }
+            }
+
+            if (step === 4 && progressContainer) {
+                progressContainer.style.display = 'none';
                 calculateEstimation();
             }
 
             updateRecap(step);
+        }
+
+        function goBack() {
+            if (currentStep > 1) {
+                const prevStep = currentStep - 1;
+                document.getElementById(`step-${currentStep}`).classList.remove('active');
+                currentStep = prevStep;
+                document.getElementById(`step-${currentStep}`).classList.add('active');
+
+                const progress = (currentStep / 4) * 100;
+                document.getElementById('progress-fill').style.width = progress + '%';
+                document.getElementById('step-text').textContent = `Étape ${currentStep}/4`;
+
+                const subtitle = document.getElementById('subtitle');
+                const mainTitle = document.querySelector('main-title');
+                const backButton = document.querySelector('.back-button');
+                const progressContainer = document.getElementById('progress-container');
+
+                if (currentStep === 1) {
+                    if (subtitle) subtitle.classList.remove('hidden');
+                    if (backButton) backButton.classList.remove('visible');
+                }
+
+                if (currentStep < 4 && progressContainer) {
+                    progressContainer.style.display = 'block';
+                }
+            }
         }
 
         function validateCurrentStep() {
@@ -711,16 +768,6 @@
             return true;
         }
 
-        function toggleSection(sectionId) {
-            const section = document.getElementById(sectionId);
-            const title = event.target;
-            
-            if (section) {
-                section.classList.toggle('hidden');
-                title.classList.toggle('collapsed');
-            }
-        }
-
         function selectFinition(finition) {
             document.querySelectorAll('.finition-card').forEach(card => {
                 card.classList.remove('selected');
@@ -753,6 +800,16 @@
             
             document.getElementById('estimated-price').textContent = 
                 estimatedPrice.toLocaleString('fr-FR') + ' €';
+        }
+
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const title = event.target;
+            
+            if (section) {
+                section.classList.toggle('hidden');
+                title.classList.toggle('collapsed');
+            }
         }
 
         function closeWidget() {
