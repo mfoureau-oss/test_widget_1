@@ -321,11 +321,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -396,6 +391,26 @@
             font-size: 0.85rem;
             color: #666;
             margin-bottom: 1rem;
+        }
+
+        #step-2 .vehicle-recap {
+            font-size: 0.95rem;
+            color: #000;
+            margin-bottom: 1.25rem;
+            font-weight: 600;
+            background: #f0fffe;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 3px solid #13d0ca;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #step-2 .vehicle-recap::before {
+            content: 'Véhicule trouvé : ';
+            color: #13d0ca;
+            font-weight: 700;
         }
 
         .reassurance-box {
@@ -659,16 +674,13 @@
     </style>
 </head>
 <body>
-    <!-- Contenu du site en arrière-plan -->
     <div class="site-background"></div>
 
-    <!-- Modal Widget -->
     <div class="modal-overlay">
         <div class="widget-container">
             <button class="back-button" onclick="goBack()" aria-label="Retour">←</button>
             <button class="close-btn" onclick="closeWidget()" aria-label="Fermer">×</button>
             
-            <!-- Loader -->
             <div class="loader-overlay" id="loader">
                 <div class="loader"></div>
                 <div class="loader-text">Recherche des finitions disponibles...</div>
@@ -694,13 +706,17 @@
             </div>
 
             <div class="widget-content">
-                <!-- ÉTAPE 1 -->
                 <div class="step active" id="step-1">
                     <div class="form-row">
                         <div class="form-group" style="margin-bottom: 0;">
                             <label class="form-label">Immatriculation</label>
                             <input type="text" class="form-input" id="immatriculation" placeholder="Ex. AB-123-CD" maxlength="10">
                             <div class="error-message" id="error-immat">Format invalide (ex: AA-123-CD)</div>
+                            <div style="margin-top: 0.5rem;">
+                                <button onclick="goToManualEntry()" style="background: none; border: none; color: #13d0ca; text-decoration: underline; cursor: pointer; font-size: 0.8rem; font-family: Arial, sans-serif; padding: 0;">
+                                    Je ne connais pas mon immatriculation
+                                </button>
+                            </div>
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
                             <label class="form-label">Kilométrage</label>
@@ -722,7 +738,104 @@
                     <button class="cta-button" onclick="goToStep(2)" id="btn-step1" disabled>Confirmer le véhicule</button>
                 </div>
 
-                <!-- ÉTAPE 2 -->
+                <div class="step" id="step-1b">
+                    <h2 class="form-label" style="margin-bottom: 1rem; text-align: center;">Renseignez les informations de votre véhicule</h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Marque</label>
+                        <select class="form-input" id="marque">
+                            <option value="">Sélectionnez une marque</option>
+                            <option value="Peugeot">Peugeot</option>
+                            <option value="Citroën">Citroën</option>
+                            <option value="DS">DS</option>
+                            <option value="Opel">Opel</option>
+                            <option value="Renault">Renault</option>
+                            <option value="Volkswagen">Volkswagen</option>
+                            <option value="Toyota">Toyota</option>
+                            <option value="BMW">BMW</option>
+                            <option value="Mercedes">Mercedes</option>
+                            <option value="Audi">Audi</option>
+                            <option value="Ford">Ford</option>
+                            <option value="Nissan">Nissan</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Modèle</label>
+                        <select class="form-input" id="modele">
+                            <option value="">Sélectionnez un modèle</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label">Mois</label>
+                            <select class="form-input" id="mois">
+                                <option value="">Mois</option>
+                                <option value="01">Janvier</option>
+                                <option value="02">Février</option>
+                                <option value="03">Mars</option>
+                                <option value="04">Avril</option>
+                                <option value="05">Mai</option>
+                                <option value="06">Juin</option>
+                                <option value="07">Juillet</option>
+                                <option value="08">Août</option>
+                                <option value="09">Septembre</option>
+                                <option value="10">Octobre</option>
+                                <option value="11">Novembre</option>
+                                <option value="12">Décembre</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label">Année</label>
+                            <select class="form-input" id="annee">
+                                <option value="">Année</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Énergie</label>
+                        <select class="form-input" id="energie">
+                            <option value="">Sélectionnez une énergie</option>
+                            <option value="Essence">Essence</option>
+                            <option value="Diesel">Diesel</option>
+                            <option value="Hybride">Hybride</option>
+                            <option value="Hybride rechargeable">Hybride rechargeable</option>
+                            <option value="Électrique">Électrique</option>
+                            <option value="GPL">GPL</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Version</label>
+                        <select class="form-input" id="version">
+                            <option value="">Sélectionnez une version</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Kilométrage</label>
+                        <select class="form-input" id="kilometrage-manual">
+                            <option value="">Sélectionnez un kilométrage</option>
+                            <option value="5000">Moins de 10 000 km</option>
+                            <option value="15000">10 000 - 20 000 km</option>
+                            <option value="25000">20 000 - 30 000 km</option>
+                            <option value="35000">30 000 - 40 000 km</option>
+                            <option value="45000">40 000 - 50 000 km</option>
+                            <option value="60000">50 000 - 70 000 km</option>
+                            <option value="80000">70 000 - 90 000 km</option>
+                            <option value="100000">90 000 - 110 000 km</option>
+                            <option value="125000">110 000 - 140 000 km</option>
+                            <option value="160000">140 000 - 180 000 km</option>
+                            <option value="200000">Plus de 180 000 km</option>
+                        </select>
+                    </div>
+
+                    <button class="cta-button" onclick="goToStep(3)" id="btn-step1b" disabled>Continuer</button>
+                </div>
+
                 <div class="step" id="step-2">
                     <div class="vehicle-recap" id="recap-step2"></div>
                     
@@ -740,7 +853,6 @@
                     <button class="cta-button" onclick="goToStep(3)" id="btn-step2" disabled>Suivant</button>
                 </div>
 
-                <!-- ÉTAPE 3 -->
                 <div class="step" id="step-3">
                     <div class="vehicle-recap" id="recap-step3"></div>
                     
@@ -808,7 +920,6 @@
                     <button class="cta-button" onclick="goToStep(4)" id="btn-step3" disabled>Obtenir votre estimation</button>
                 </div>
 
-                <!-- ÉTAPE 4 -->
                 <div class="step" id="step-4">
                     <div class="result-price">
                         <div class="price-label">Estimation de votre véhicule</div>
@@ -846,10 +957,89 @@
         let userData = {
             immatriculation: '',
             kilometrage: '',
-            finition: ''
+            finition: '',
+            marque: '',
+            modele: '',
+            mois: '',
+            annee: '',
+            energie: '',
+            version: ''
         };
 
-        // Formatage automatique de l'immatriculation
+        // Générer les années (de l'année actuelle jusqu'à 1990)
+        const anneeSelect = document.getElementById('annee');
+        const currentYear = new Date().getFullYear();
+        for (let year = currentYear; year >= 1990; year--) {
+            const option = document.createElement('option');
+            option.value = year;
+            option.textContent = year;
+            anneeSelect.appendChild(option);
+        }
+
+        // Gestion des modèles selon la marque
+        const modelesParMarque = {
+            'Peugeot': ['208', '308', '2008', '3008', '5008', '508', 'Rifter', 'Partner', 'Expert'],
+            'Citroën': ['C3', 'C4', 'C5', 'Berlingo', 'Jumpy', 'C3 Aircross', 'C5 Aircross'],
+            'DS': ['DS 3', 'DS 4', 'DS 7', 'DS 9'],
+            'Opel': ['Corsa', 'Astra', 'Mokka', 'Crossland', 'Grandland', 'Combo'],
+            'Renault': ['Clio', 'Captur', 'Megane', 'Scenic', 'Kadjar', 'Arkana', 'Austral', 'Twingo'],
+            'Volkswagen': ['Polo', 'Golf', 'Tiguan', 'T-Roc', 'Passat', 'Touran', 'ID.3', 'ID.4'],
+            'Toyota': ['Yaris', 'Corolla', 'C-HR', 'RAV4', 'Aygo', 'Prius', 'Camry'],
+            'BMW': ['Série 1', 'Série 2', 'Série 3', 'Série 4', 'Série 5', 'X1', 'X3', 'X5'],
+            'Mercedes': ['Classe A', 'Classe B', 'Classe C', 'Classe E', 'GLA', 'GLC', 'GLE'],
+            'Audi': ['A1', 'A3', 'A4', 'A5', 'A6', 'Q2', 'Q3', 'Q5', 'Q7'],
+            'Ford': ['Fiesta', 'Focus', 'Puma', 'Kuga', 'Mustang', 'Transit'],
+            'Nissan': ['Micra', 'Juke', 'Qashqai', 'X-Trail', 'Leaf'],
+            'Autre': []
+        };
+
+        const versionsParEnergie = {
+            'Essence': ['1.0 70ch', '1.2 PureTech 110ch', '1.2 PureTech 130ch', '1.5 TSI 150ch', '1.6 THP 165ch', '2.0 TFSI 190ch'],
+            'Diesel': ['1.5 BlueHDi 100ch', '1.5 BlueHDi 130ch', '1.6 BlueHDi 120ch', '2.0 BlueHDi 150ch', '2.0 BlueHDi 180ch'],
+            'Hybride': ['Hybrid 136ch', 'Hybrid 160ch', 'Hybrid 180ch', 'Hybrid 225ch'],
+            'Hybride rechargeable': ['Hybrid 180ch', 'Hybrid 225ch', 'Hybrid4 300ch'],
+            'Électrique': ['136ch', '156ch', '218ch'],
+            'GPL': ['1.2 PureTech 110ch GPL']
+        };
+
+        document.getElementById('marque').addEventListener('change', function() {
+            const marque = this.value;
+            const modeleSelect = document.getElementById('modele');
+            
+            // Réinitialiser le select modèle
+            modeleSelect.innerHTML = '<option value="">Sélectionnez un modèle</option>';
+            
+            if (marque && modelesParMarque[marque]) {
+                modelesParMarque[marque].forEach(modele => {
+                    const option = document.createElement('option');
+                    option.value = modele;
+                    option.textContent = modele;
+                    modeleSelect.appendChild(option);
+                });
+            }
+            
+            checkStep1bCompletion();
+        });
+
+        document.getElementById('energie').addEventListener('change', function() {
+            const energie = this.value;
+            const versionSelect = document.getElementById('version');
+            
+            // Réinitialiser le select version
+            versionSelect.innerHTML = '<option value="">Sélectionnez une version</option>';
+            
+            if (energie && versionsParEnergie[energie]) {
+                versionsParEnergie[energie].forEach(version => {
+                    const option = document.createElement('option');
+                    option.value = version;
+                    option.textContent = version;
+                    versionSelect.appendChild(option);
+                });
+            }
+            
+            checkStep1bCompletion();
+        });
+
         document.getElementById('immatriculation').addEventListener('input', function(e) {
             let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
             
@@ -888,7 +1078,39 @@
             }
         }
 
-        // Formatage automatique du téléphone
+        // Validation étape 1b (saisie manuelle)
+        document.getElementById('modele').addEventListener('change', checkStep1bCompletion);
+        document.getElementById('mois').addEventListener('change', checkStep1bCompletion);
+        document.getElementById('annee').addEventListener('change', checkStep1bCompletion);
+        document.getElementById('version').addEventListener('change', checkStep1bCompletion);
+        document.getElementById('kilometrage-manual').addEventListener('change', checkStep1bCompletion);
+
+        function checkStep1bCompletion() {
+            const marque = document.getElementById('marque').value.trim();
+            const modele = document.getElementById('modele').value.trim();
+            const mois = document.getElementById('mois').value.trim();
+            const annee = document.getElementById('annee').value.trim();
+            const energie = document.getElementById('energie').value.trim();
+            const version = document.getElementById('version').value.trim();
+            const km = document.getElementById('kilometrage-manual').value.trim();
+            const btn = document.getElementById('btn-step1b');
+            
+            if (marque && modele && mois && annee && energie && version && km) {
+                btn.disabled = false;
+            } else {
+                btn.disabled = true;
+            }
+        }
+
+        function goToManualEntry() {
+            document.getElementById('step-1').classList.remove('active');
+            document.getElementById('step-1b').classList.add('active');
+            currentStep = '1b';
+            
+            const backButton = document.querySelector('.back-button');
+            backButton?.classList.add('visible');
+        }
+
         document.getElementById('telephone').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
             let formatted = '';
@@ -904,7 +1126,6 @@
             hideError('tel');
         });
 
-        // Validation nom/prénom (lettres uniquement)
         document.getElementById('nom').addEventListener('input', function(e) {
             e.target.value = e.target.value.replace(/[^a-zA-ZÀ-ÿ\s\-']/g, '');
             hideError('nom');
@@ -976,13 +1197,12 @@
         function goToStep(step) {
             if (!validateCurrentStep()) return;
 
-            // Afficher le loader entre l'étape 1 et 2
             if (currentStep === 1 && step === 2) {
                 showLoader();
                 setTimeout(() => {
                     hideLoader();
                     changeStep(step);
-                }, 1500); // Loader pendant 1.5 secondes
+                }, 1500);
             } else {
                 changeStep(step);
             }
@@ -1054,6 +1274,19 @@
 
                 if (progressContainer) progressContainer.style.display = 'block';
                 document.querySelector('.widget-content').scrollTop = 0;
+            } else if (currentStep === '1b') {
+                // Retour de 1b vers 1
+                document.getElementById('step-1b').classList.remove('active');
+                document.getElementById('step-1').classList.add('active');
+                currentStep = 1;
+                
+                const subtitle = document.getElementById('subtitle');
+                const backButton = document.querySelector('.back-button');
+                
+                subtitle?.classList.remove('hidden');
+                backButton?.classList.remove('visible');
+                
+                document.querySelector('.widget-content').scrollTop = 0;
             }
         }
 
@@ -1064,14 +1297,12 @@
                 
                 let isValid = true;
                 
-                // Validation immatriculation (format AA-123-CD)
                 const immatRegex = /^[A-Z]{2}-[0-9]{3}-[A-Z]{2}$/;
                 if (!immat || !immatRegex.test(immat)) {
                     showError('immat');
                     isValid = false;
                 }
                 
-                // Validation kilométrage
                 if (!km || parseInt(km) <= 0) {
                     showError('km');
                     isValid = false;
@@ -1081,6 +1312,19 @@
                 
                 userData.immatriculation = immat;
                 userData.kilometrage = km;
+            }
+
+            if (currentStep === '1b') {
+                // Validation saisie manuelle
+                userData.marque = document.getElementById('marque').value.trim();
+                userData.modele = document.getElementById('modele').value.trim();
+                userData.mois = document.getElementById('mois').value.trim();
+                userData.annee = document.getElementById('annee').value.trim();
+                userData.energie = document.getElementById('energie').value.trim();
+                userData.version = document.getElementById('version').value.trim();
+                userData.kilometrage = document.getElementById('kilometrage-manual').value.trim();
+                
+                return true;
             }
 
             if (currentStep === 2) {
@@ -1100,27 +1344,23 @@
 
                 let isValid = true;
                 
-                // Validation nom (lettres uniquement)
                 const nameRegex = /^[a-zA-ZÀ-ÿ\s\-']+$/;
                 if (!nom || !nameRegex.test(nom)) {
                     showError('nom');
                     isValid = false;
                 }
                 
-                // Validation prénom
                 if (!prenom || !nameRegex.test(prenom)) {
                     showError('prenom');
                     isValid = false;
                 }
                 
-                // Validation email
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!email || !emailRegex.test(email)) {
                     showError('email');
                     isValid = false;
                 }
                 
-                // Validation téléphone (format 06 00 00 00 00)
                 const telRegex = /^[0-9]{2}\s[0-9]{2}\s[0-9]{2}\s[0-9]{2}\s[0-9]{2}$/;
                 if (!tel || !telRegex.test(tel)) {
                     showError('tel');
@@ -1149,7 +1389,16 @@
 
         function updateRecap(step) {
             if (step >= 2) {
-                const recap = `Peugeot 308 Hybride • 2022 • ${parseInt(userData.kilometrage).toLocaleString('fr-FR')} km${userData.finition ? ' • ' + userData.finition : ''}`;
+                let recap = '';
+                if (userData.immatriculation) {
+                    // Parcours avec immatriculation
+                    recap = `Peugeot 308 Hybride • 2022 • ${parseInt(userData.kilometrage).toLocaleString('fr-FR')} km${userData.finition ? ' • ' + userData.finition : ''}`;
+                } else {
+                    // Parcours manuel
+                    const moisNames = ['', 'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
+                    const moisName = userData.mois ? moisNames[parseInt(userData.mois)] : '';
+                    recap = `${userData.marque} ${userData.modele} • ${userData.energie} • ${moisName} ${userData.annee} • ${parseInt(userData.kilometrage).toLocaleString('fr-FR')} km`;
+                }
                 const element = document.getElementById(`recap-step${step}`);
                 if (element) element.innerHTML = recap;
             }
